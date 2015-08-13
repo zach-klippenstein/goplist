@@ -1,3 +1,4 @@
+// See https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man5/plist.5.html#//apple_ref/doc/man/5/plist
 package plist
 
 import (

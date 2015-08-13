@@ -53,19 +53,8 @@ func TestDictRoot(t *testing.T) {
 
 	buffer := new(bytes.Buffer)
 	err := Marshal(dict, buffer)
-
 	assert.NoError(t, err)
 	assert.Equal(t, expected, buffer.String())
-}
-
-func TestAppendDictToArray(t *testing.T) {
-	array := &Array{}
-	array.Append(NewDictFromMap(map[string]string{"foo": "bar"}))
-}
-
-func TestAppendMapToArray(t *testing.T) {
-	array := &Array{}
-	array.Append(map[string]string{"foo": "bar"})
 }
 
 func TestArrayRoot(t *testing.T) {

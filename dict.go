@@ -76,6 +76,12 @@ func (d *Dict) Get(key string) (value interface{}, exists bool) {
 	return nil, false
 }
 
+func (d *Dict) Keys() []string {
+	keys := make([]string, len(d.ordering))
+	copy(keys, d.ordering)
+	return keys
+}
+
 func (d *Dict) value() interface{} {
 	var dict map[string]interface{}
 	for k, v := range d.dict {
