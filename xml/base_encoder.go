@@ -13,8 +13,8 @@ type ArrayEncodingFunc func(*ArrayEncoder) error
 
 type baseEncoder struct {
 	// Need to hang on to the underlying writer so we can control formatting.
-	w io.Writer
-	e *xml.Encoder
+	writer     io.Writer
+	xmlEncoder *xml.Encoder
 
 	// Set by StartArray or StartDict, and automatically closed when this encoder
 	// is used again.
@@ -28,19 +28,25 @@ func newBaseEncoder(w io.Writer) *baseEncoder {
 	e := xml.NewEncoder(w)
 	e.Indent("", "\t")
 
-	return &baseEncoder{w: w, e: e}
+	return &baseEncoder{
+		writer:     w,
+		xmlEncoder: e,
+	}
 }
 
 // copy returns a *baseEncoder with the same writer and xml encoder but
 // fresh state flags.
 func (e *baseEncoder) copy() *baseEncoder {
-	return &baseEncoder{w: e.w, e: e.e}
+	return &baseEncoder{
+		writer:     e.writer,
+		xmlEncoder: e.xmlEncoder,
+	}
 }
 
 // writeEndTag encodes an end element and marks the encoder as finished.
 // Any subsequent operations will panic.
 func (e *baseEncoder) writeEndTag(endElement xml.EndElement) error {
-	if err := e.e.EncodeToken(endElement); err != nil {
+	if err := e.xmlEncoder.EncodeToken(endElement); err != nil {
 		return err
 	}
 	e.finished = true

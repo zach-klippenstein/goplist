@@ -34,26 +34,26 @@ func startPlist(w io.Writer) (*baseEncoder, error) {
 		return nil, fmt.Errorf("error writing plist header: %s", err)
 	}
 
-	if err := base.e.EncodeToken(plistStartElement); err != nil {
+	if err := base.xmlEncoder.EncodeToken(plistStartElement); err != nil {
 		return nil, err
 	}
 	return base, nil
 }
 
 func writePlistHeader(e *baseEncoder) error {
-	if err := e.e.EncodeToken(procInst); err != nil {
+	if err := e.xmlEncoder.EncodeToken(procInst); err != nil {
 		return err
 	}
 	// Encoder won't add a newline after the processing instruction, so we have
 	// to do it manually.
-	if err := writeNewline(e.w, e.e); err != nil {
+	if err := writeNewline(e.writer, e.xmlEncoder); err != nil {
 		return err
 	}
 
-	if err := e.e.EncodeToken(doctype); err != nil {
+	if err := e.xmlEncoder.EncodeToken(doctype); err != nil {
 		return err
 	}
-	if err := writeNewline(e.w, e.e); err != nil {
+	if err := writeNewline(e.writer, e.xmlEncoder); err != nil {
 		return err
 	}
 	return nil
@@ -64,7 +64,7 @@ func writePlistEndTag(e *baseEncoder) error {
 	if err := e.writeEndTag(plistStartElement.End()); err != nil {
 		return err
 	}
-	return e.e.Flush()
+	return e.xmlEncoder.Flush()
 }
 
 // writeNewline is used to force conventional XML plist formatting when

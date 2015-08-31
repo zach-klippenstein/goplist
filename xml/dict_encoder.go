@@ -10,7 +10,7 @@ var dictStartElement = xmlElement("dict")
 var dictKeyElement = xmlElement("key")
 
 func newDictEncoder(base *baseEncoder) (*DictEncoder, error) {
-	if err := base.e.EncodeToken(dictStartElement); err != nil {
+	if err := base.xmlEncoder.EncodeToken(dictStartElement); err != nil {
 		return nil, err
 	}
 	return &DictEncoder{base}, nil
@@ -21,7 +21,7 @@ func (e *DictEncoder) WriteString(key string, val string) error {
 	if err := e.writeKey(key); err != nil {
 		return err
 	}
-	return writeString(e.e, val)
+	return writeString(e.xmlEncoder, val)
 }
 
 func (e *DictEncoder) WriteBool(key string, val bool) error {
@@ -29,7 +29,7 @@ func (e *DictEncoder) WriteBool(key string, val bool) error {
 	if err := e.writeKey(key); err != nil {
 		return err
 	}
-	return writeBool(e.e, val)
+	return writeBool(e.xmlEncoder, val)
 }
 
 func (e *DictEncoder) WriteFloat(key string, val float64) error {
@@ -37,7 +37,7 @@ func (e *DictEncoder) WriteFloat(key string, val float64) error {
 	if err := e.writeKey(key); err != nil {
 		return err
 	}
-	return writeFloat(e.e, val)
+	return writeFloat(e.xmlEncoder, val)
 }
 
 func (e *DictEncoder) WriteInt(key string, val int64) error {
@@ -45,7 +45,7 @@ func (e *DictEncoder) WriteInt(key string, val int64) error {
 	if err := e.writeKey(key); err != nil {
 		return err
 	}
-	return writeInt(e.e, val)
+	return writeInt(e.xmlEncoder, val)
 }
 
 func (e *DictEncoder) WriteUint(key string, val uint64) error {
@@ -53,7 +53,7 @@ func (e *DictEncoder) WriteUint(key string, val uint64) error {
 	if err := e.writeKey(key); err != nil {
 		return err
 	}
-	return writeUint(e.e, val)
+	return writeUint(e.xmlEncoder, val)
 }
 
 func (e *DictEncoder) WriteDate(key string, val time.Time) error {
@@ -61,7 +61,7 @@ func (e *DictEncoder) WriteDate(key string, val time.Time) error {
 	if err := e.writeKey(key); err != nil {
 		return err
 	}
-	return writeDate(e.e, val)
+	return writeDate(e.xmlEncoder, val)
 }
 
 func (e *DictEncoder) WriteData(key string, val []byte) error {
@@ -69,7 +69,7 @@ func (e *DictEncoder) WriteData(key string, val []byte) error {
 	if err := e.writeKey(key); err != nil {
 		return err
 	}
-	return writeData(e.e, val)
+	return writeData(e.xmlEncoder, val)
 }
 
 func (e *DictEncoder) WriteArray(key string, encode ArrayEncodingFunc) error {
@@ -94,5 +94,5 @@ func (e *DictEncoder) writeEndTag() error {
 }
 
 func (e *DictEncoder) writeKey(key string) error {
-	return e.e.EncodeElement(key, dictKeyElement)
+	return e.xmlEncoder.EncodeElement(key, dictKeyElement)
 }
