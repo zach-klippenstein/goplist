@@ -3,6 +3,7 @@ package xml
 import (
 	"bytes"
 	"encoding/xml"
+	"math/big"
 	"testing"
 	"time"
 
@@ -37,10 +38,24 @@ func TestWriteUint(t *testing.T) {
 	assert.Equal(t, `<integer>42</integer>`, buffer.String())
 }
 
+func TestWriteBigInt(t *testing.T) {
+	var buffer bytes.Buffer
+	e := xml.NewEncoder(&buffer)
+	assert.NoError(t, writeBigInt(e, big.NewInt(42)))
+	assert.Equal(t, `<integer>42</integer>`, buffer.String())
+}
+
 func TestWriteFloat(t *testing.T) {
 	var buffer bytes.Buffer
 	e := xml.NewEncoder(&buffer)
 	assert.NoError(t, writeFloat(e, 4.2))
+	assert.Equal(t, `<real>4.2</real>`, buffer.String())
+}
+
+func TestWriteBigFloat(t *testing.T) {
+	var buffer bytes.Buffer
+	e := xml.NewEncoder(&buffer)
+	assert.NoError(t, writeBigFloat(e, big.NewFloat(4.2)))
 	assert.Equal(t, `<real>4.2</real>`, buffer.String())
 }
 

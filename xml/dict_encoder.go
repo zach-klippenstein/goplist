@@ -1,6 +1,9 @@
 package xml
 
-import "time"
+import (
+	"math/big"
+	"time"
+)
 
 type DictEncoder struct {
 	*baseEncoder
@@ -40,6 +43,14 @@ func (e *DictEncoder) WriteFloat(key string, val float64) error {
 	return writeFloat(e.xmlEncoder, val)
 }
 
+func (e *DictEncoder) WriteBigFloat(key string, val *big.Float) error {
+	e.assertReady()
+	if err := e.writeKey(key); err != nil {
+		return err
+	}
+	return writeBigFloat(e.xmlEncoder, val)
+}
+
 func (e *DictEncoder) WriteInt(key string, val int64) error {
 	e.assertReady()
 	if err := e.writeKey(key); err != nil {
@@ -54,6 +65,14 @@ func (e *DictEncoder) WriteUint(key string, val uint64) error {
 		return err
 	}
 	return writeUint(e.xmlEncoder, val)
+}
+
+func (e *DictEncoder) WriteBigInt(key string, val *big.Int) error {
+	e.assertReady()
+	if err := e.writeKey(key); err != nil {
+		return err
+	}
+	return writeBigInt(e.xmlEncoder, val)
 }
 
 func (e *DictEncoder) WriteDate(key string, val time.Time) error {

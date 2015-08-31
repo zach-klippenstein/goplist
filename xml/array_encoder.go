@@ -1,6 +1,9 @@
 package xml
 
-import "time"
+import (
+	"math/big"
+	"time"
+)
 
 type ArrayEncoder struct {
 	*baseEncoder
@@ -30,6 +33,11 @@ func (e *ArrayEncoder) WriteFloat(val float64) error {
 	return writeFloat(e.xmlEncoder, val)
 }
 
+func (e *ArrayEncoder) WriteBigFloat(val *big.Float) error {
+	e.assertReady()
+	return writeBigFloat(e.xmlEncoder, val)
+}
+
 func (e *ArrayEncoder) WriteInt(val int64) error {
 	e.assertReady()
 	return writeInt(e.xmlEncoder, val)
@@ -38,6 +46,11 @@ func (e *ArrayEncoder) WriteInt(val int64) error {
 func (e *ArrayEncoder) WriteUint(val uint64) error {
 	e.assertReady()
 	return writeUint(e.xmlEncoder, val)
+}
+
+func (e *ArrayEncoder) WriteBigInt(val *big.Int) error {
+	e.assertReady()
+	return writeBigInt(e.xmlEncoder, val)
 }
 
 func (e *ArrayEncoder) WriteDate(val time.Time) error {

@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"io"
+	"math/big"
 	"time"
 )
 
@@ -120,15 +121,17 @@ func writeString(e *xml.Encoder, val string) error {
 
 func writeBool(e *xml.Encoder, val bool) error {
 	if val {
-		// return encodeClosedElement(w, boolTrueElementName)
 		return e.EncodeElement("", boolTrueElement)
 	}
-	// return encodeClosedElement(w, boolFalseElementName)
 	return e.EncodeElement("", boolFalseElement)
 }
 
 func writeFloat(e *xml.Encoder, val float64) error {
 	return e.EncodeElement(val, realStartElement)
+}
+
+func writeBigFloat(e *xml.Encoder, val *big.Float) error {
+	return e.EncodeElement(val.String(), realStartElement)
 }
 
 func writeInt(e *xml.Encoder, val int64) error {
@@ -137,6 +140,10 @@ func writeInt(e *xml.Encoder, val int64) error {
 
 func writeUint(e *xml.Encoder, val uint64) error {
 	return e.EncodeElement(val, integerStartElement)
+}
+
+func writeBigInt(e *xml.Encoder, val *big.Int) error {
+	return e.EncodeElement(val.String(), integerStartElement)
 }
 
 // writeDate encodes val as an ISO 8601/RFC 3339 date string.
