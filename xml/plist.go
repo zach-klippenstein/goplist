@@ -1,5 +1,5 @@
 /*
-Package xml implements Apple's XML plist format.
+Package xml implements and encoder and decoder for Apple's XML plist format.
 
 A plist file is encoded as a top-level array or dictionary, to which
 primitives and other arrays/dictionaries can be written.
