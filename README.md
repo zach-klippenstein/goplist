@@ -3,9 +3,3 @@
 A library for reading and writing OSX plist files.
 
 See the [documentation](https://godoc.org/github.com/zach-klippenstein/goplist) for examples.
-
-## TODO
-
-* reading
-* []byte (<data>)
-* time.Time (<date>)
