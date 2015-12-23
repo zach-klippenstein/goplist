@@ -4,10 +4,14 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"math/big"
+	"reflect"
 	"time"
 )
+
+const plistFieldTagName = "plist"
 
 type DictEncodingFunc func(*DictEncoder) error
 type ArrayEncodingFunc func(*ArrayEncoder) error
@@ -73,7 +77,7 @@ func (e *baseEncoder) assertReady() {
 // writeArray locks this encoder and calls encode with an encoder that
 // can be used to write array entries.
 // The return value of encode is returned.
-func (e *baseEncoder) writeArray(encode ArrayEncodingFunc) error {
+func (e *baseEncoder) writeArrayFunc(encode ArrayEncodingFunc) error {
 	e.startContainer()
 	defer e.endContainer()
 
@@ -92,7 +96,7 @@ func (e *baseEncoder) writeArray(encode ArrayEncodingFunc) error {
 // writeDict locks this encoder and calls encode with an encoder that
 // can be used to write dictionary entries.
 // The return value of encode is returned.
-func (e *baseEncoder) writeDict(encode DictEncodingFunc) error {
+func (e *baseEncoder) writeDictFunc(encode DictEncodingFunc) error {
 	e.startContainer()
 	defer e.endContainer()
 
@@ -115,6 +119,7 @@ func (e *baseEncoder) startContainer() {
 func (e *baseEncoder) endContainer() {
 	e.encodingContainer = false
 }
+
 func writeString(e *xml.Encoder, val string) error {
 	return e.EncodeElement(val, stringStartElement)
 }
@@ -161,4 +166,55 @@ func writeData(e *xml.Encoder, val []byte) error {
 	encoder.Close()
 
 	return e.EncodeElement(encoded.String(), dataStartElement)
+}
+
+func arrayWriter(val reflect.Value) ArrayEncodingFunc {
+	return func(e *ArrayEncoder) (err error) {
+		for i := 0; i < val.Len(); i++ {
+			elem := val.Index(i)
+			if err = e.write(elem); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+}
+
+func mapWriter(val reflect.Value) DictEncodingFunc {
+	return func(e *DictEncoder) (err error) {
+		for _, key := range val.MapKeys() {
+			elem := val.MapIndex(key)
+
+			if key.Kind() != reflect.String {
+				return fmt.Errorf("key must be a string: %v", key)
+			}
+
+			if err = e.write(key.String(), elem); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+}
+
+func structWriter(val reflect.Value) DictEncodingFunc {
+	return func(e *DictEncoder) (err error) {
+		for i := 0; i < val.NumField(); i++ {
+			field := val.Type().Field(i)
+			fieldVal := val.Field(i)
+			key := keyForField(field)
+
+			if err = e.write(key, fieldVal); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+}
+
+func keyForField(field reflect.StructField) string {
+	if tag := field.Tag.Get(plistFieldTagName); tag != "" {
+		return tag
+	}
+	return field.Name
 }

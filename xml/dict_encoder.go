@@ -1,7 +1,9 @@
 package xml
 
 import (
+	"fmt"
 	"math/big"
+	"reflect"
 	"time"
 )
 
@@ -17,6 +19,34 @@ func newDictEncoder(base *baseEncoder) (*DictEncoder, error) {
 		return nil, err
 	}
 	return &DictEncoder{base}, nil
+}
+
+func (e *DictEncoder) Write(key string, val interface{}) error {
+	e.assertReady()
+	return e.write(key, reflect.ValueOf(val))
+}
+
+func (e *DictEncoder) write(key string, val reflect.Value) error {
+	switch val.Kind() {
+	case reflect.Array, reflect.Slice:
+		return e.WriteArray(key, arrayWriter(val))
+	case reflect.Map:
+		return e.WriteDict(key, mapWriter(val))
+	case reflect.Struct:
+		return e.WriteDict(key, structWriter(val))
+	case reflect.Bool:
+		return e.WriteBool(key, val.Bool())
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return e.WriteInt(key, val.Int())
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return e.WriteUint(key, val.Uint())
+	case reflect.String:
+		return e.WriteString(key, val.String())
+	case reflect.Ptr, reflect.Interface:
+		return e.write(key, val.Elem())
+	default:
+		return fmt.Errorf("invalid type for encoding: %v (%v)", val, val.Kind())
+	}
 }
 
 func (e *DictEncoder) WriteString(key string, val string) error {
@@ -96,7 +126,7 @@ func (e *DictEncoder) WriteArray(key string, encode ArrayEncodingFunc) error {
 	if err := e.writeKey(key); err != nil {
 		return err
 	}
-	return e.writeArray(encode)
+	return e.writeArrayFunc(encode)
 }
 
 func (e *DictEncoder) WriteDict(key string, encode DictEncodingFunc) error {
@@ -104,7 +134,7 @@ func (e *DictEncoder) WriteDict(key string, encode DictEncodingFunc) error {
 	if err := e.writeKey(key); err != nil {
 		return err
 	}
-	return e.writeDict(encode)
+	return e.writeDictFunc(encode)
 }
 
 func (e *DictEncoder) writeEndTag() error {

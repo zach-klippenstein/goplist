@@ -4,14 +4,29 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"reflect"
 )
+
+func Encode(w io.Writer, v interface{}) error {
+	val := reflect.ValueOf(v)
+	switch val.Kind() {
+	case reflect.Array, reflect.Slice:
+		return EncodeArrayPlist(w, arrayWriter(val))
+	case reflect.Map:
+		return EncodeDictPlist(w, mapWriter(val))
+	case reflect.Struct:
+		return EncodeDictPlist(w, structWriter(val))
+	default:
+		return fmt.Errorf("invalid type for encoding: %v (%v)", val, val.Kind())
+	}
+}
 
 func EncodeArrayPlist(w io.Writer, encode ArrayEncodingFunc) error {
 	encoder, err := startPlist(w)
 	if err != nil {
 		return err
 	}
-	if err = encoder.writeArray(encode); err != nil {
+	if err = encoder.writeArrayFunc(encode); err != nil {
 		return err
 	}
 	return writePlistEndTag(encoder)
@@ -22,7 +37,7 @@ func EncodeDictPlist(w io.Writer, encode DictEncodingFunc) error {
 	if err != nil {
 		return err
 	}
-	if err = encoder.writeDict(encode); err != nil {
+	if err = encoder.writeDictFunc(encode); err != nil {
 		return err
 	}
 	return writePlistEndTag(encoder)

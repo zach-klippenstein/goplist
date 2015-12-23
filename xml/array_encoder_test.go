@@ -47,3 +47,7 @@ func TestWriteRecursiveArray(t *testing.T) {
 	}))
 	assert.Equal(t, expected, buffer.String())
 }
+
+func TestWriteArrayInterface(t *testing.T) {
+	// TODO
+}

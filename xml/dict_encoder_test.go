@@ -52,3 +52,7 @@ func TestWriteRecursiveDict(t *testing.T) {
 	}))
 	assert.Equal(t, expected, buffer.String())
 }
+
+func TestWriteDictInterface(t *testing.T) {
+	// TODO
+}

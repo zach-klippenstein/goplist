@@ -1,7 +1,9 @@
 package xml
 
 import (
+	"fmt"
 	"math/big"
+	"reflect"
 	"time"
 )
 
@@ -16,6 +18,34 @@ func newArrayEncoder(base *baseEncoder) (*ArrayEncoder, error) {
 		return nil, err
 	}
 	return &ArrayEncoder{base}, nil
+}
+
+func (e *ArrayEncoder) Write(val interface{}) error {
+	e.assertReady()
+	return e.write(reflect.ValueOf(val))
+}
+
+func (e *ArrayEncoder) write(val reflect.Value) error {
+	switch val.Kind() {
+	case reflect.Array, reflect.Slice:
+		return e.WriteArray(arrayWriter(val))
+	case reflect.Map:
+		return e.WriteDict(mapWriter(val))
+	case reflect.Struct:
+		return e.WriteDict(structWriter(val))
+	case reflect.Bool:
+		return e.WriteBool(val.Bool())
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return e.WriteInt(val.Int())
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return e.WriteUint(val.Uint())
+	case reflect.String:
+		return e.WriteString(val.String())
+	case reflect.Ptr, reflect.Interface:
+		return e.write(val.Elem())
+	default:
+		return fmt.Errorf("invalid type for encoding: %v (%v)", val, val.Kind())
+	}
 }
 
 func (e *ArrayEncoder) WriteString(val string) error {
@@ -65,12 +95,12 @@ func (e *ArrayEncoder) WriteData(val []byte) error {
 
 func (e *ArrayEncoder) WriteArray(encode ArrayEncodingFunc) error {
 	e.assertReady()
-	return e.writeArray(encode)
+	return e.writeArrayFunc(encode)
 }
 
 func (e *ArrayEncoder) WriteDict(encode DictEncodingFunc) error {
 	e.assertReady()
-	return e.writeDict(encode)
+	return e.writeDictFunc(encode)
 }
 
 func (e *ArrayEncoder) writeEndTag() error {
