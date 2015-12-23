@@ -21,7 +21,7 @@ func TestWriteEmptyPlist(t *testing.T) {
 }
 
 func Example_encoding() {
-	err := WriteDictPlist(os.Stdout, func(e *DictEncoder) error {
+	err := EncodeDictPlist(os.Stdout, func(e *DictEncoder) error {
 		if err := e.WriteString("name", "Bilbo Baggins"); err != nil {
 			return err
 		}

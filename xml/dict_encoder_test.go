@@ -21,7 +21,7 @@ func TestWriteDict(t *testing.T) {
 	</dict>
 </plist>`
 	var buffer bytes.Buffer
-	assert.NoError(t, WriteDictPlist(&buffer, func(e *DictEncoder) error {
+	assert.NoError(t, EncodeDictPlist(&buffer, func(e *DictEncoder) error {
 		assert.NoError(t, e.WriteString("foo", "bar"))
 		assert.NoError(t, e.WriteBool("true", true))
 		assert.NoError(t, e.WriteInt("the answer to everything", 42))
@@ -43,7 +43,7 @@ func TestWriteRecursiveDict(t *testing.T) {
 	</dict>
 </plist>`
 	var buffer bytes.Buffer
-	assert.NoError(t, WriteDictPlist(&buffer, func(e *DictEncoder) error {
+	assert.NoError(t, EncodeDictPlist(&buffer, func(e *DictEncoder) error {
 		assert.NoError(t, e.WriteDict("rabbit hole", func(e *DictEncoder) error {
 			assert.NoError(t, e.WriteString("foo", "bar"))
 			return nil

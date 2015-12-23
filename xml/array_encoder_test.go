@@ -18,7 +18,7 @@ func TestWriteArray(t *testing.T) {
 	</array>
 </plist>`
 	var buffer bytes.Buffer
-	assert.NoError(t, WriteArrayPlist(&buffer, func(e *ArrayEncoder) error {
+	assert.NoError(t, EncodeArrayPlist(&buffer, func(e *ArrayEncoder) error {
 		assert.NoError(t, e.WriteString("foo"))
 		assert.NoError(t, e.WriteBool(true))
 		assert.NoError(t, e.WriteFloat(4.2))
@@ -38,7 +38,7 @@ func TestWriteRecursiveArray(t *testing.T) {
 	</array>
 </plist>`
 	var buffer bytes.Buffer
-	assert.NoError(t, WriteArrayPlist(&buffer, func(e *ArrayEncoder) error {
+	assert.NoError(t, EncodeArrayPlist(&buffer, func(e *ArrayEncoder) error {
 		assert.NoError(t, e.WriteArray(func(e *ArrayEncoder) error {
 			assert.NoError(t, e.WriteString("hi"))
 			return nil

@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-func WriteArrayPlist(w io.Writer, encode ArrayEncodingFunc) error {
+func EncodeArrayPlist(w io.Writer, encode ArrayEncodingFunc) error {
 	encoder, err := startPlist(w)
 	if err != nil {
 		return err
@@ -17,7 +17,7 @@ func WriteArrayPlist(w io.Writer, encode ArrayEncodingFunc) error {
 	return writePlistEndTag(encoder)
 }
 
-func WriteDictPlist(w io.Writer, encode DictEncodingFunc) error {
+func EncodeDictPlist(w io.Writer, encode DictEncodingFunc) error {
 	encoder, err := startPlist(w)
 	if err != nil {
 		return err
